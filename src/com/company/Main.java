@@ -2,6 +2,7 @@ package com.company;
 import java.awt.*;
 import javax.swing.*;
 import javax.sound.midi.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileOutputStream;
 import java.util.*;
 import java.awt.event.*;
@@ -258,9 +259,16 @@ public class Main
             }
             try
             {
-                FileOutputStream fileStream=new FileOutputStream(new File("Checkbox.ser"));
-                ObjectOutputStream os=new ObjectOutputStream(fileStream);
-                os.writeObject(checkboxState);
+                FileNameExtensionFilter filter=new FileNameExtensionFilter("*.ser","*.*");
+                JFileChooser savefile=new JFileChooser();
+                savefile.setFileFilter(filter);
+                int ret=savefile.showDialog(null, "Save file");
+                if(ret==JFileChooser.APPROVE_OPTION)
+                {
+                    FileOutputStream fileStream = new FileOutputStream(savefile.getSelectedFile());
+                    ObjectOutputStream os = new ObjectOutputStream(fileStream);
+                    os.writeObject(checkboxState);
+                }
             }
             catch(Exception ex)
             {
@@ -275,11 +283,18 @@ public class Main
             boolean[] checkboxState=null;
             try
             {
-                FileInputStream fileIn=new FileInputStream(new File("Checkbox.ser"));
-                ObjectInputStream is=new ObjectInputStream(fileIn);
-                checkboxState=(boolean[])is.readObject();
-                //Считываем объект из файла и определяем его как булев
-                //массив, т.к. readObject возвращает ссылку на тип Object
+                JFileChooser fileopen=new JFileChooser();
+                int ret=fileopen.showDialog(null, "Open file");
+                //переменная ret позволяет узнать, что именно сделал пользователь
+                if(ret==JFileChooser.APPROVE_OPTION)
+                {
+                    FileInputStream fileIn=new FileInputStream(fileopen.getSelectedFile());
+                    ObjectInputStream is=new ObjectInputStream(fileIn);
+                    checkboxState=(boolean[])is.readObject();
+                    //Считываем объект из файла и определяем его как булев
+                    //массив, т.к. readObject возвращает ссылку на тип Object
+                }
+                //если пользователь выбрал файл
             }
             catch(Exception ex)
             {
